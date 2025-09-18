@@ -1,5 +1,6 @@
 import { DragonTypes, type Dragon } from './dragon.model'
-import { DragonApiService } from './dragon.api.service'
+import { MemoryDragonRepository } from './repositories/memory-dragon-repository';
+import { initProviders } from '../services/dependency-injector/injector.service';
 import { createListeners, createUI } from './dragon.component'
 
 // operación reutilizable que renderiza un dragon en un test.
@@ -33,9 +34,14 @@ describe('Given a Dragon component', () => {
 });
 
 describe("When applying listeners", () => {
+  // creación de la instancia de la dependencia invertida (D de SOLID)
+  const dragonRepository = new MemoryDragonRepository();
+
   // Como siempre que tenemos listeners hay que renderizar un dragón y añadir sus listeners,
   // añadimos ese código en un beforeEach, el cual se ejecuta antes de cada test
   beforeEach(() => {
+    // iniciamos el inyector con el provider del dragonRepository, el que usa nuestro componente
+    initProviders({ dragonRepository });
     renderTestDragon();
     createListeners();
   });
@@ -43,7 +49,7 @@ describe("When applying listeners", () => {
   // despues de cada caso de test debemos borrar todo la "basura" que va generando nuestro test.
   // En este caso, lo que hayamos almacenado en el sistema de persistencia
   afterEach(async () => {
-    await DragonApiService.deleteAll(); // el async/await lo mencionaremos más adelante
+    await dragonRepository.deleteAll();
   });
 
   it("should create a dragon", async () => {
@@ -65,7 +71,7 @@ describe("When applying listeners", () => {
     form.dispatchEvent(new Event("submit", { bubbles: true }));
 
     // comprobamos que efectivamente el dragon se encuentra en el storage
-    const createdDragon = await DragonApiService.findDragonById("1");
+    const createdDragon = await dragonRepository.findDragonById("1");
     expect(createdDragon).toEqual(dragonMock);
   });
 });

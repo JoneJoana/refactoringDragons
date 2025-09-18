@@ -19,4 +19,10 @@ export const dragonTypesToUIOptions = (): string =>
     .map(
       ([key, value]) => `<option value="${value}">${key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}</option>`
     )
-    .join('')
+    .join('');
+
+export interface DragonRepository {
+  createDragon(dragonFormData: FormData): Promise<Dragon>;
+  findDragonById(id: string): Promise<Dragon>;
+}
+

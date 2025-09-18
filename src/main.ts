@@ -7,6 +7,17 @@ import { AnalyticsService } from './services/analytics.service'
 import { OperationTeamBusinessService } from './services/operation-team.service'
 import { DragonTypes, type Dragon } from './dragons/dragon.model'
 import { NotificationService } from './services/notification.service'
+import { initProviders } from "./services/dependency-injector/injector.service";
+import { MemoryDragonRepository } from "./dragons/repositories/memory-dragon-repository";
+//import { RestDragonRepository } from "./dragons/repositories/rest-dragon-repository";
+
+//initProviders({
+  //dragonRepository: new RestDragonRepository(),
+//});
+
+initProviders({
+  dragonRepository: new MemoryDragonRepository(),
+});
 
 mockWindowFetch()
 
@@ -18,7 +29,7 @@ const analyticsListener = (createdDragon: Dragon) => AnalyticsService.trackEvent
 const operationTeamListener = (createdDragon: Dragon) =>
   OperationTeamBusinessService.notifyAfterDragonCreation(createdDragon)
 const userNotificationListener = (createdDragon: Dragon) =>
-  NotificationService.notify('user@email', 'Dragincitos', createdDragon.toString())
+  NotificationService.notify('user@email', 'Dragincitos', createdDragon.name)
 
 const awardDialogListener = (createdDragon: Dragon) => {
   if (createdDragon.type !== DragonTypes.GOLD) {
